@@ -1,0 +1,12 @@
+streamlit==1.22.0
+numpy
+os
+copy
+re
+chardet
+collections
+matplotlib
+math
+itertools
+cycler
+scipy
