@@ -32,10 +32,10 @@ def page_accueil():
     """
     )   
     st.divider()
+    
     import os
     import tempfile
-    chemins = {}
-    st.subheader("📂 Fichiers à traiter")
+    
     upload_dir = os.path.join(tempfile.gettempdir(), "tiramisu_uploads")
     os.makedirs(upload_dir, exist_ok=True)
 
@@ -45,24 +45,16 @@ def page_accueil():
             st.markdown(f"**{name}**")
             uploaded = st.file_uploader(
                 f"Browse or drop a file ({name})",
-                type=["txt", "csv", "dat", "inp", "ck"],
+                type=["txt", "csv", "dat", "inp", "ck", "slurm"],
                 key=f"upload_{i}",
             )
-            typed_path = st.text_input(
-                f"Or type the file path ({name})",
-                placeholder="/path/to/file.txt",
-                key=f"path_{i}",
-            )
 
-            # Convert everything to one file path (str)
+            # Convert the uploaded file to one file path (str)
             if uploaded is not None:
                 chemin = os.path.join(upload_dir, uploaded.name)
                 with open(chemin, "wb") as f:
                     f.write(uploaded.getbuffer())
                 st.caption(f"File received, path: `{chemin}`")
-            elif typed_path:
-                chemin = typed_path
-                st.caption(f"Path entered: `{chemin}`")
             else:
                 chemin = None
                 st.caption("No file provided yet.")
@@ -85,18 +77,8 @@ def page_accueil():
                 continue
             if first_line:
                 st.write(f"**{name}** (`{chemin}`) — first line: `{first_line}`")
-            # empty file: display nothing
 
-    with st.expander("🔎 Collected paths"):
-        st.write(chemins)
-    # col1, col2, col3 = st.columns(3)
-    # with col1:
-    #     st.metric("Fenêtres", "6")
-    # with col2:
-    #     st.metric("Version", "1.0")
-    # with col3:
-    #     st.metric("Statut", "OK")
-    # st.info("Astuce : cliquez sur une page dans la barre latérale pour changer de fenêtre.")
+
 
 
 # ============================================================
