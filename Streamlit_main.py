@@ -85,8 +85,9 @@ def page_accueil():
     # Paths stored in session state so the other pages can use them
     st.session_state["mechanism_paths"] = chemins
 
-    # --- Button to process the paths: show the first line of each file ---
+    # --- Button to process: build a rmn.Model for each mechanism ---
     if st.button("⚙️ Process files"):
+        # {"mech1": model1, "mech2": model2, ...}, shared with the other pages via session_state
         if "models" not in st.session_state:
             st.session_state["models"] = {}
         for mech_key, paths in chemins.items():
@@ -94,12 +95,11 @@ def page_accueil():
             if not path_mech and not path_therm and not path_trans:
                 continue
             try:
-                model = rmn.Model(path_mech, path_therm, path_trans)
-                st.session_state["models"][mech_key] = model
-                st.success(f"**{mech_key}** — Model created from mech=`{path_mech}`, therm=`{path_therm}`, trans=`{path_trans}`")
+                mechi = rmn.Model(path_mech, path_therm, path_trans)
+                st.session_state["models"][mech_key] = mechi
+                st.success(f"{mech_key} — Model created : {len(mechi.spe)} species, {len(mechi.rea)} reactions")
             except Exception as e:
                 st.error(f"**{mech_key}** — Model failed: {e}")
-
 
 
 
