@@ -6,16 +6,31 @@ Created on Wed Nov 25 16:16:23 2026
 """
 
 import streamlit as st
+
 st.set_page_config(
-    page_title="TIRAMISU'\n-\nThermodynamic Interpretation of Reactions and Automated Merging for Inter-Scheme Union",
+    page_title="TIRAMISU",
     page_icon="🗂️",
     layout="wide",
 )
 
 
 def page_accueil():
-    st.title("🏠 Accueil")
-    st.markdown("Bienvenue dans l'application. Utilisez le menu de gauche pour naviguer entre les 6 fenêtres.")
+    st.title("🍮 TIRAMISU")
+    st.markdown(
+    """
+    Bienvenue dans **TIRAMISU**, une application de manipulation de
+    mécanismes cinétiques de combustion (format CHEMKIN).
+
+    Elle permet notamment de :
+    - traduire et fusionner des mécanismes entre eux, ou d'en extraire des sous-mécanismes ;
+    - inverser des réactions ;
+    - lire des polynômes NASA.
+
+    *Méthode de traduction, fusion et extraction automatique : T. Fages, R. Veillet, R. Fournet, B. Sirjean, P.-A. Glaude,
+    « An automatic merging method for large kinetic mechanisms »,
+    DOI : 10.1016/j.ces.2024.120870*
+    """
+    )   
     col1, col2, col3 = st.columns(3)
     with col1:
         st.metric("Fenêtres", "6")
