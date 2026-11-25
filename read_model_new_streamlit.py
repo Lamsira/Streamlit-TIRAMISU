@@ -5,13 +5,12 @@ import copy
 from collections import Counter
 
 class Model :
-    def __init__(self, path_mech, path_therm, out, path_trans='', verbose=True, encoding='utf-8', base_mechanism='', keep_all=False):
+    def __init__(self, path_mech, path_therm, path_trans='', out='', encoding='utf-8', base_mechanism='', keep_all=False):
 
         self.path_mech = path_mech
         self.path_therm = path_therm
         self.encoding=encoding
         self.out = out
-        self.verbose=verbose
         self.base_mechanism=base_mechanism
         self.keep_all=keep_all
         self.coll_species=set()
@@ -536,14 +535,7 @@ class Model :
         
         ############## WRITING LOGS #################   
         root, extension = os.path.splitext(self.path_mech)
-        if self.verbose == True :
-            with open(self.out+os.path.basename(root)+"_mech.log", 'w') as log:
-            # with open(self.path_mech+'.log', 'w') as log:
-                for rea in reactions :
-                    log.write(f'Species : {rea.species} Coef : {rea.coef} is_rev : {rea.is_rev}'
-                +f' third_body : {rea.third_body} len speed&sup_i {len(rea.speed)} {len(rea.supinfo)}\n')
-        
-        
+       
         is_in_rea=set()
         for reaction in reactions :
             for side in reaction.species :
@@ -823,13 +815,6 @@ class Model :
         # print(purged_therm[index_line-1])
         
         root, extension = os.path.splitext(self.path_therm)
-        if self.verbose == True :
-            with open(self.out+os.path.basename(root)+"_therm.log", 'w') as log:
-            # with open(self.path_therm+'.log', 'w') as log :
-                for therm in therm_data :
-                    log.write(f'Temp : {therm_data[therm].temp_list} {therm_data[therm].species} {therm_data[therm].atomic_composition} \n')
-                log.write("".join(not_in_mech))
-                log.write("".join(therm_duplicate))
                 
         return(therm_data)
 
@@ -899,12 +884,6 @@ class Model :
                     not_in_mech.append(f'TRANS DATA NOT IN MECH : {data[0]}\n')
                     
         root, extension = os.path.splitext(self.path_trans)
-        if self.verbose == True :
-            with open(self.out+os.path.basename(root)+"_trans.log", 'w') as log:
-                for trans in trans_data :
-                    t_d=trans_data[trans]
-                    log.write(f'{t_d.species} : {t_d.geo} {t_d.lj_p} {t_d.lj_cd} {t_d.dp} {t_d.p} {t_d.rr} {t_d.comment}\n')
-                log.write("".join(not_in_mech))
         return(trans_data)
                 
     
