@@ -51,12 +51,10 @@ def page_accueil():
         if st.button("🔄 Reset"):
             st.session_state["n_mechanisms"] = 1
             st.session_state["mechanism_paths"] = {}
-            # clear the upload widgets of mechanisms > 1 so their paths are emptied
+            # clear ALL upload widgets (drag & drop emptied too)
             for key in list(st.session_state.keys()):
                 if key.startswith("upload_"):
-                    idx = int(key.rsplit("_", 1)[1])
-                    if idx > 1:
-                        del st.session_state[key]
+                    del st.session_state[key]
 
     chemins = {}  # file paths collected here, reusable later in the code
     for i in range(1, st.session_state["n_mechanisms"] + 1):
