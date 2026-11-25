@@ -17,82 +17,55 @@ st.set_page_config(
 def page_accueil():
     st.title("🍮 TIRAMISU")
     st.markdown(
-    """
-    Welcome to **TIRAMISU**, an application for handling
-    combustion kinetic mechanisms (only support CHEMKIN format).
+        """
+        Welcome to **TIRAMISU**, an application for handling
+        combustion kinetic mechanisms (only support CHEMKIN format).
 
-    It allows you to:
-    - translate and merge mechanisms, or extract sub-mechanisms;
-    - reverse reactions;
-    - read NASA polynomials.
+        It allows you to:
+        - translate and merge mechanisms, or extract sub-mechanisms;
+        - reverse reactions;
+        - read NASA polynomials.
 
-    *Automatic translation and merging method: T. Fages, R. Veillet, R. Fournet, B. Sirjean, P.-A. Glaude,
-    « An automatic merging method for large kinetic mechanisms »,
-    DOI : 10.1016/j.ces.2024.120870*
-    """
-    )   
+        *Automatic translation and merging method: T. Fages, R. Veillet, R. Fournet, B. Sirjean, P.-A. Glaude,
+        « An automatic merging method for large kinetic mechanisms »,
+        DOI : 10.1016/j.ces.2024.120870*
+        """
+    )
     st.divider()
-    
+
     import os
     import tempfile
-    
+
     upload_dir = os.path.join(tempfile.gettempdir(), "tiramisu_uploads")
     os.makedirs(upload_dir, exist_ok=True)
 
+    # Number of mechanism containers ("+" button adds one)
+    if "n_mechanisms" not in st.session_state:
+        st.session_state["n_mechanisms"] = 1
+
+    if st.button("➕ Add a mechanism"):
+        st.session_state["n_mechanisms"] += 1
+
     chemins = {}  # file paths collected here, reusable later in the code
-    with st.container(border=True):
-        st.markdown(f"**Mechanism 1**")
-        name='mech_1'
-        uploaded = st.file_uploader('Gas-phase kinetics file',key=f"upload_mech_1")
-        if uploaded is not None:
-            chemin = os.path.join(upload_dir, uploaded.name)
-            with open(chemin, "wb") as f:
-                f.write(uploaded.getbuffer())
-            st.caption(f"File received, path: `{chemin}`")
-        else:
-            chemin = None
-            st.caption("No file provided yet.")
-        chemins[name] = chemin
-    
-        name='therm_1'
-        uploaded = st.file_uploader('Thermodynamics data file',key=f"upload_therm_1")
-        if uploaded is not None:
-            chemin = os.path.join(upload_dir, uploaded.name)
-            with open(chemin, "wb") as f:
-                f.write(uploaded.getbuffer())
-            st.caption(f"File received, path: `{chemin}`")
-        else:
-            chemin = None
-            st.caption("No file provided yet.")
-        chemins[name] = chemin
-
-        name='trans_1'
-        uploaded = st.file_uploader('Gas transport data file',key=f"upload_trans_1")
-        if uploaded is not None:
-            chemin = os.path.join(upload_dir, uploaded.name)
-            with open(chemin, "wb") as f:
-                f.write(uploaded.getbuffer())
-            st.caption(f"File received, path: `{chemin}`")
-        else:
-            chemin = None
-            st.caption("No file provided yet.")
-        chemins[name] = chemin
-
-    # for i, name in enumerate(["Mechanism file", "Thermodynamics file", "Transport file"], start=1):
-    #     with st.container(border=True):
-    #         st.markdown(f"**{name}**")
-    #         uploaded = st.file_uploader(key=f"upload_{i}")
-    #         # Convert the uploaded file to one file path (str)
-    #         if uploaded is not None:
-    #             chemin = os.path.join(upload_dir, uploaded.name)
-    #             with open(chemin, "wb") as f:
-    #                 f.write(uploaded.getbuffer())
-    #             st.caption(f"File received, path: `{chemin}`")
-    #         else:
-    #             chemin = None
-    #             st.caption("No file provided yet.")
-
-    #         chemins[name] = chemin
+    for i in range(1, st.session_state["n_mechanisms"] + 1):
+        with st.container(border=True):
+            st.markdown(f"**Mechanism {i}**")
+            for kind, label in [
+                ("mech", "Gas-phase kinetics file"),
+                ("therm", "Thermodynamics data file"),
+                ("trans", "Gas transport data file"),
+            ]:
+                name = f"{kind}_{i}"
+                uploaded = st.file_uploader(label, key=f"upload_{name}")
+                if uploaded is not None:
+                    chemin = os.path.join(upload_dir, uploaded.name)
+                    with open(chemin, "wb") as f:
+                        f.write(uploaded.getbuffer())
+                    st.caption(f"File received, path: `{chemin}`")
+                else:
+                    chemin = None
+                    st.caption("No file provided yet.")
+                chemins[name] = chemin
 
     # Paths stored in session state so the other pages can use them
     st.session_state["mechanism_paths"] = chemins
@@ -110,6 +83,7 @@ def page_accueil():
                 continue
             if first_line:
                 st.write(f"**{name}** (`{chemin}`) — first line: `{first_line}`")
+
 
 
 
