@@ -85,6 +85,8 @@ def page_accueil():
     # --- Button to process the paths: show the first line of each file ---
     if st.button("⚙️ Process files"):
         for name, chemin in chemins.items():
+            print(name, chemin)
+
             if chemin is None:
                 continue
             try:
