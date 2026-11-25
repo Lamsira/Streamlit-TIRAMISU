@@ -40,26 +40,59 @@ def page_accueil():
     os.makedirs(upload_dir, exist_ok=True)
 
     chemins = {}  # file paths collected here, reusable later in the code
-    for i, name in enumerate(["Mechanism file", "Thermodynamics file", "Transport file"], start=1):
-        with st.container(border=True):
-            st.markdown(f"**{name}**")
-            uploaded = st.file_uploader(
-                f"Browse or drop a file ({name})",
-                type=["txt", "csv", "dat", "inp", "ck", "slurm"],
-                key=f"upload_{i}",
-            )
+    with st.container(border=True):
+        st.markdown(f"**Mechanism 1**")
+        name='mech_1'
+        uploaded = st.file_uploader('Gas-phase kinetics file',key=f"upload_mech_1")
+        if uploaded is not None:
+            chemin = os.path.join(upload_dir, uploaded.name)
+            with open(chemin, "wb") as f:
+                f.write(uploaded.getbuffer())
+            st.caption(f"File received, path: `{chemin}`")
+        else:
+            chemin = None
+            st.caption("No file provided yet.")
+        chemins[name] = chemin
+    
+        name='therm_1'
+        uploaded = st.file_uploader('Thermodynamics data file',key=f"upload_therm_1")
+        if uploaded is not None:
+            chemin = os.path.join(upload_dir, uploaded.name)
+            with open(chemin, "wb") as f:
+                f.write(uploaded.getbuffer())
+            st.caption(f"File received, path: `{chemin}`")
+        else:
+            chemin = None
+            st.caption("No file provided yet.")
+        chemins[name] = chemin
 
-            # Convert the uploaded file to one file path (str)
-            if uploaded is not None:
-                chemin = os.path.join(upload_dir, uploaded.name)
-                with open(chemin, "wb") as f:
-                    f.write(uploaded.getbuffer())
-                st.caption(f"File received, path: `{chemin}`")
-            else:
-                chemin = None
-                st.caption("No file provided yet.")
+        name='trans_1'
+        uploaded = st.file_uploader('Gas transport data file',key=f"upload_trans_1")
+        if uploaded is not None:
+            chemin = os.path.join(upload_dir, uploaded.name)
+            with open(chemin, "wb") as f:
+                f.write(uploaded.getbuffer())
+            st.caption(f"File received, path: `{chemin}`")
+        else:
+            chemin = None
+            st.caption("No file provided yet.")
+        chemins[name] = chemin
 
-            chemins[name] = chemin
+    # for i, name in enumerate(["Mechanism file", "Thermodynamics file", "Transport file"], start=1):
+    #     with st.container(border=True):
+    #         st.markdown(f"**{name}**")
+    #         uploaded = st.file_uploader(key=f"upload_{i}")
+    #         # Convert the uploaded file to one file path (str)
+    #         if uploaded is not None:
+    #             chemin = os.path.join(upload_dir, uploaded.name)
+    #             with open(chemin, "wb") as f:
+    #                 f.write(uploaded.getbuffer())
+    #             st.caption(f"File received, path: `{chemin}`")
+    #         else:
+    #             chemin = None
+    #             st.caption("No file provided yet.")
+
+    #         chemins[name] = chemin
 
     # Paths stored in session state so the other pages can use them
     st.session_state["mechanism_paths"] = chemins
