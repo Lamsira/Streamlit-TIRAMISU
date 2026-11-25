@@ -43,8 +43,20 @@ def page_accueil():
     if "n_mechanisms" not in st.session_state:
         st.session_state["n_mechanisms"] = 1
 
-    if st.button("➕ Add a mechanism"):
-        st.session_state["n_mechanisms"] += 1
+    col_plus, col_reset = st.columns(2)
+    with col_plus:
+        if st.button("➕ Add a mechanism"):
+            st.session_state["n_mechanisms"] += 1
+    with col_reset:
+        if st.button("🔄 Reset"):
+            st.session_state["n_mechanisms"] = 1
+            st.session_state["mechanism_paths"] = {}
+            # clear the upload widgets of mechanisms > 1 so their paths are emptied
+            for key in list(st.session_state.keys()):
+                if key.startswith("upload_"):
+                    idx = int(key.rsplit("_", 1)[1])
+                    if idx > 1:
+                        del st.session_state[key]
 
     chemins = {}  # file paths collected here, reusable later in the code
     for i in range(1, st.session_state["n_mechanisms"] + 1):
