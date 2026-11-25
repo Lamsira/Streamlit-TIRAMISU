@@ -1,5 +1,5 @@
 streamlit==1.67.0
-numpy==2.2.6
+numpy
 os
 copy
 re==2.2.1
