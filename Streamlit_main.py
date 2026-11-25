@@ -18,38 +18,77 @@ def page_accueil():
     st.title("🍮 TIRAMISU")
     st.markdown(
     """
-    Bienvenue dans **TIRAMISU**, une application de manipulation de
-    mécanismes cinétiques de combustion (format CHEMKIN).
+    Welcome to **TIRAMISU**, an application for handling
+    combustion kinetic mechanisms (only support CHEMKIN format).
 
-    Elle permet notamment de :
-    - traduire et fusionner des mécanismes entre eux, ou d'en extraire des sous-mécanismes ;
-    - inverser des réactions ;
-    - lire des polynômes NASA.
+    It allows you to:
+    - translate and merge mechanisms, or extract sub-mechanisms;
+    - reverse reactions;
+    - read NASA polynomials.
 
-    *Méthode de traduction, fusion et extraction automatique : T. Fages, R. Veillet, R. Fournet, B. Sirjean, P.-A. Glaude,
+    *Automatic translation and merging method: T. Fages, R. Veillet, R. Fournet, B. Sirjean, P.-A. Glaude,
     « An automatic merging method for large kinetic mechanisms »,
     DOI : 10.1016/j.ces.2024.120870*
     """
     )   
     st.divider()
+    import os
+    import tempfile
+    chemins = {}
     st.subheader("📂 Fichiers à traiter")
-    for i, nom in enumerate(["Mécanisme 1", "Mécanisme 2", "Fichier supplémentaire"], start=1):
+    upload_dir = os.path.join(tempfile.gettempdir(), "tiramisu_uploads")
+    os.makedirs(upload_dir, exist_ok=True)
+
+    chemins = {}  # file paths collected here, reusable later in the code
+    for i, name in enumerate(["Mechanism file", "Thermodynamics file", "Transport file"], start=1):
         with st.container(border=True):
-            st.markdown(f"**{nom}**")
-            fichier = st.file_uploader(
-                f"Déposer un fichier ({nom})",
+            st.markdown(f"**{name}**")
+            uploaded = st.file_uploader(
+                f"Browse or drop a file ({name})",
                 type=["txt", "csv", "dat", "inp", "ck"],
                 key=f"upload_{i}",
             )
-            chemin = st.text_input(
-                f"Ou indiquer le chemin du fichier ({nom})",
-                placeholder="/chemin/vers/fichier.txt",
+            typed_path = st.text_input(
+                f"Or type the file path ({name})",
+                placeholder="/path/to/file.txt",
                 key=f"path_{i}",
             )
-            if fichier is not None:
-                st.caption(f"Fichier déposé : {fichier.name}")
-            elif chemin:
-                st.caption(f"Chemin saisi : `{chemin}`")
+
+            # Convert everything to one file path (str)
+            if uploaded is not None:
+                chemin = os.path.join(upload_dir, uploaded.name)
+                with open(chemin, "wb") as f:
+                    f.write(uploaded.getbuffer())
+                st.caption(f"File received, path: `{chemin}`")
+            elif typed_path:
+                chemin = typed_path
+                st.caption(f"Path entered: `{chemin}`")
+            else:
+                chemin = None
+                st.caption("No file provided yet.")
+
+            chemins[name] = chemin
+
+    # Paths stored in session state so the other pages can use them
+    st.session_state["mechanism_paths"] = chemins
+
+    # --- Button to process the paths: show the first line of each file ---
+    if st.button("⚙️ Process files"):
+        for name, chemin in chemins.items():
+            if chemin is None:
+                continue
+            try:
+                with open(chemin, "r", encoding="utf-8", errors="replace") as f:
+                    first_line = f.readline().strip()
+            except OSError as e:
+                st.error(f"**{name}** (`{chemin}`) — cannot read file: {e}")
+                continue
+            if first_line:
+                st.write(f"**{name}** (`{chemin}`) — first line: `{first_line}`")
+            # empty file: display nothing
+
+    with st.expander("🔎 Collected paths"):
+        st.write(chemins)
     # col1, col2, col3 = st.columns(3)
     # with col1:
     #     st.metric("Fenêtres", "6")
