@@ -5,12 +5,11 @@ import copy
 from collections import Counter
 
 class Model :
-    def __init__(self, path_mech, path_therm, path_trans='', out='', encoding='utf-8', base_mechanism='', keep_all=False):
+    def __init__(self, path_mech, path_therm, path_trans='', encoding='utf-8', base_mechanism='', keep_all=False):
 
         self.path_mech = path_mech
         self.path_therm = path_therm
         self.encoding=encoding
-        self.out = out
         self.base_mechanism=base_mechanism
         self.keep_all=keep_all
         self.coll_species=set()
