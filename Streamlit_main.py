@@ -87,18 +87,18 @@ def page_accueil():
 
     # --- Button to process the paths: show the first line of each file ---
     if st.button("⚙️ Process files"):
+        if "models" not in st.session_state:
+            st.session_state["models"] = {}
         for mech_key, paths in chemins.items():
-            for kind, chemin in zip(["mech", "therm", "trans"], paths):
-                if not chemin:
-                    continue
-                try:
-                    with open(chemin, "r", encoding="utf-8", errors="replace") as f:
-                        first_line = f.readline().strip()
-                except OSError as e:
-                    st.error(f"**{mech_key}/{kind}** (`{chemin}`) — cannot read file: {e}")
-                    continue
-                if first_line:
-                    st.write(f"**{mech_key}/{kind}** (`{chemin}`) — first line: `{first_line}`")
+            path_mech, path_therm, path_trans = paths
+            if not path_mech and not path_therm and not path_trans:
+                continue
+            try:
+                model = rmn.Model(path_mech, path_therm, path_trans)
+                st.session_state["models"][mech_key] = model
+                st.success(f"**{mech_key}** — Model created from mech=`{path_mech}`, therm=`{path_therm}`, trans=`{path_trans}`")
+            except Exception as e:
+                st.error(f"**{mech_key}** — Model failed: {e}")
 
 
 
