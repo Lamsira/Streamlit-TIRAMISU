@@ -31,14 +31,33 @@ def page_accueil():
     DOI : 10.1016/j.ces.2024.120870*
     """
     )   
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.metric("Fenêtres", "6")
-    with col2:
-        st.metric("Version", "1.0")
-    with col3:
-        st.metric("Statut", "OK")
-    st.info("Astuce : cliquez sur une page dans la barre latérale pour changer de fenêtre.")
+    st.divider()
+    st.subheader("📂 Fichiers à traiter")
+    for i, nom in enumerate(["Mécanisme 1", "Mécanisme 2", "Fichier supplémentaire"], start=1):
+        with st.container(border=True):
+            st.markdown(f"**{nom}**")
+            fichier = st.file_uploader(
+                f"Déposer un fichier ({nom})",
+                type=["txt", "csv", "dat", "inp", "ck"],
+                key=f"upload_{i}",
+            )
+            chemin = st.text_input(
+                f"Ou indiquer le chemin du fichier ({nom})",
+                placeholder="/chemin/vers/fichier.txt",
+                key=f"path_{i}",
+            )
+            if fichier is not None:
+                st.caption(f"Fichier déposé : {fichier.name}")
+            elif chemin:
+                st.caption(f"Chemin saisi : `{chemin}`")
+    # col1, col2, col3 = st.columns(3)
+    # with col1:
+    #     st.metric("Fenêtres", "6")
+    # with col2:
+    #     st.metric("Version", "1.0")
+    # with col3:
+    #     st.metric("Statut", "OK")
+    # st.info("Astuce : cliquez sur une page dans la barre latérale pour changer de fenêtre.")
 
 
 # ============================================================
