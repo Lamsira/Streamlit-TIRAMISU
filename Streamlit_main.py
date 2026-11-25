@@ -25,7 +25,8 @@ def page_accueil():
         It allows you to:
         - translate and merge mechanisms, or extract sub-mechanisms;
         - reverse reactions;
-        - read NASA polynomials.
+        - read NASA polynomials;
+        - generate trasport properties.
 
         *Automatic translation and merging method: T. Fages, R. Veillet, R. Fournet, B. Sirjean, P.-A. Glaude,
         « An automatic merging method for large kinetic mechanisms »,
