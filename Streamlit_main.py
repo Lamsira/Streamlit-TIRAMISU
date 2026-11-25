@@ -39,9 +39,9 @@ def page_accueil():
     upload_dir = os.path.join(tempfile.gettempdir(), "tiramisu_uploads")
     os.makedirs(upload_dir, exist_ok=True)
 
-    # Number of mechanism containers ("+" button adds one)
+    # Number of mechanism containers (starts at 0: nothing shown until "+" is pressed)
     if "n_mechanisms" not in st.session_state:
-        st.session_state["n_mechanisms"] = 1
+        st.session_state["n_mechanisms"] = 0
 
     col_plus, col_reset = st.columns(2)
     with col_plus:
@@ -49,12 +49,14 @@ def page_accueil():
             st.session_state["n_mechanisms"] += 1
     with col_reset:
         if st.button("🔄 Reset"):
-            st.session_state["n_mechanisms"] = 1
+            st.session_state["n_mechanisms"] = 0
             st.session_state["mechanism_paths"] = {}
-            # clear ALL upload widgets (drag & drop emptied too)
             for key in list(st.session_state.keys()):
                 if key.startswith("upload_"):
                     del st.session_state[key]
+
+    if st.session_state["n_mechanisms"] == 0:
+        st.caption("No mechanism yet. Press ➕ to add one.")
 
     chemins = {}  # file paths collected here, reusable later in the code
     for i in range(1, st.session_state["n_mechanisms"] + 1):
