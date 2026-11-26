@@ -3,7 +3,7 @@ numpy
 #os
 #copy
 #re==2.2.1
-#chardet==5.2.0
+chardet==5.2.0
 #collections
 matplotlib==3.10.6
 #math
