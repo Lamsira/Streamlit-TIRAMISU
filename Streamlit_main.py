@@ -7,7 +7,7 @@ Created on Wed Nov 25 16:16:23 2026
 
 import streamlit as st
 import read_model_new_streamlit as rmn
-
+import chardet
 st.set_page_config(
     page_title="TIRAMISU",
     page_icon="🗂️",
@@ -96,9 +96,14 @@ def page_accueil():
             if not path_mech and not path_therm and not path_trans:
                 continue
             try:
-                mechi = rmn.Model(path_mech, path_therm, path_trans)
+                # detect the encoding of the mechanism file (fallback: utf-8)
+                enc = "utf-8"
+                if path_mech:
+                    with open(path_mech, "rb") as f:
+                        enc = chardet.detect(f.read())["encoding"] or "utf-8"
+                mechi = rmn.Model(path_mech, path_therm, path_trans, encodage=enc)
                 st.session_state["models"][mech_key] = mechi
-                st.success(f"{mech_key} — Model created : {len(mechi.spe)} species, {len(mechi.rea)} reactions")
+                st.success(f"{mech_key} — Model created : {len(mechi.spe)} species, {len(mechi.rea)} reactions (encoding: {enc})")
             except Exception as e:
                 st.error(f"**{mech_key}** — Model failed: {e}")
 
