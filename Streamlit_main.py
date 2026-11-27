@@ -173,7 +173,10 @@ def page_translation():
             st.info("Select two different mechanisms to translate.")
         else:
             # TODO: run the actual translation between the two models
-            st.write(f"Translating **{mech_from}** into **{mech_to}** ...")
+            st.write(
+            f"Translating **{mech_from}** into **{mech_to}** "
+            f"(maximum number of permutations: {max_perm}) ..."
+            )
             
 # ============================================================
 # 2. DONNÉES
