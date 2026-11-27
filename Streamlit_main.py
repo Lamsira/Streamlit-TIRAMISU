@@ -107,7 +107,14 @@ def page_accueil():
             except Exception as e:
                 st.error(f"**{mech_key}** — Model failed: {e}")
 
-
+    models = st.session_state.get("models", {})
+    if models:
+        selected = st.selectbox(
+            "Select a compiled mechanism",
+            list(models.keys()),
+            key="selected_mechanism",
+        )
+        st.session_state["selected_mechanism"] = selected
 
 
 # ============================================================
