@@ -117,7 +117,38 @@ def page_accueil():
 #            key="selected_mechanism",
 #        )
 
+def page_translation():
+    st.title("🔀 Translation")
+    st.markdown(
+        """
+        **Translate automatically the species from one model into another.**
 
+        Species are grouped into isomer families and matched between the two mechanisms
+        by comparing their Gibbs energy ΔG°/RT (computed from the NASA polynomials) over the
+        whole temperature range, using the NMAD criterion. Two matching methods are combined:
+        best pairwise NMAD first, then the best permutation of the whole isomer group
+        (mean-NMAD). A translation is kept only when a confidence threshold is met; otherwise
+        it is left to an assisted manual step, helped by comparing the reactions involving
+        the species in both mechanisms.
+        """
+    )
+    st.divider()
+
+    models = st.session_state.get("models", {})
+    if not models:
+        st.info("No mechanism compiled yet. Go to TIRAMISU, add mechanisms and press ⚙️ Process files.")
+        return
+
+    # --- Bar like on the home page: pick a source mechanism, an arrow, a target mechanism ---
+    with st.container(border=True):
+        col_from, col_arrow, col_to = st.columns([3, 1, 3])
+        with col_from:
+            st.selectbox("From mechanism", list(models.keys()), key="trans_from")
+        with col_arrow:
+            st.markdown("<h2 style='text-align: center'>➡️</h2>", unsafe_allow_html=True)
+        with col_to:
+            st.selectbox("To mechanism", list(models.keys()), key="trans_to")
+            
 # ============================================================
 # 2. DONNÉES
 # ============================================================
