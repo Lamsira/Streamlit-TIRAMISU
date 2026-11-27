@@ -107,14 +107,15 @@ def page_accueil():
             except Exception as e:
                 st.error(f"**{mech_key}** — Model failed: {e}")
 
+    # --- Shown only after Process has been used: pick one compiled mechanism ---
     models = st.session_state.get("models", {})
     if models:
-        selected = st.selectbox(
+        # the widget stores its value in st.session_state["selected_mechanism"] by itself
+        st.selectbox(
             "Select a compiled mechanism",
             list(models.keys()),
             key="selected_mechanism",
         )
-        st.session_state["selected_mechanism"] = selected
 
 
 # ============================================================
