@@ -143,7 +143,7 @@ def page_translation():
     with st.container(border=True):
         col_from, col_arrow, col_to = st.columns([3, 1, 3])
         with col_from:
-            st.selectbox("From mechanism", list(models.keys()), key="trans_from")
+            mech_from = st.selectbox("From mechanism", list(models.keys()), key="trans_from")
         with col_arrow:
             st.markdown(
                 "<svg width='60' height='24' style='display:block;margin:auto'>"
@@ -154,7 +154,15 @@ def page_translation():
                 unsafe_allow_html=True,
             )
         with col_to:
-            st.selectbox("To mechanism", list(models.keys()), key="trans_to")
+            mech_to = st.selectbox("To mechanism", list(models.keys()), key="trans_to")
+
+    # --- Translate button: does nothing if a mechanism is missing or both are the same ---
+    if st.button("🔀 Translate"):
+        if not mech_from or not mech_to or mech_from == mech_to:
+            st.info("Select two different mechanisms to translate.")
+        else:
+            # TODO: run the actual translation between the two models
+            st.write(f"Translating **{mech_from}** into **{mech_to}** ...")
             
 # ============================================================
 # 2. DONNÉES
