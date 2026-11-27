@@ -191,8 +191,9 @@ def page_translation():
     result = st.session_state.get("translation_result")
     if result:
         for iso_groups in result:
+            name=''.join(x+str(y) for x,y in iso_groups.atomic_composition)
             with st.container(border=True):
-                st.markdown(f"atomic composition: `{iso_groups.atomic_composition}`")
+                st.markdown(f"atomic composition: `{name}`")
                 if iso_groups.translations != {}:
                     for sub_group in iso_groups.translations:
                         col_key, col_sel = st.columns([1, 2])
@@ -202,10 +203,8 @@ def page_translation():
                             st.selectbox(
                                 f"Translation of {sub_group}",
                                 iso_groups.model2_species,
-                                key=f"trans_{iso_groups.atomic_composition}_{sub_group}",
+                                key=f"trans_{name}_{sub_group}",
                             )
-
-            
 # ============================================================
 # 2. DONNÉES
 # ============================================================
