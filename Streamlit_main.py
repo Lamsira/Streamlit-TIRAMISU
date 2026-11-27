@@ -153,13 +153,17 @@ def page_translation():
                 "</svg>",
                 unsafe_allow_html=True,
             )
-            st.number_input(
+            # free text input: no +/- steppers, accepts scientific notation (1e15)
+            raw = st.text_input(
                 "Maximum number of permutations",
-                min_value=0,
-                value=10000,
-                step=1000,
+                value="10000",
                 key="trans_max_perm",
             )
+            try:
+                max_perm = int(float(raw))
+            except ValueError:
+                st.warning("Invalid number, falling back to 10000.")
+                max_perm = 10000
         with col_to:
             mech_to = st.selectbox("To mechanism", list(models.keys()), key="trans_to")
 
