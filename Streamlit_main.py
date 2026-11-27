@@ -145,7 +145,14 @@ def page_translation():
         with col_from:
             st.selectbox("From mechanism", list(models.keys()), key="trans_from")
         with col_arrow:
-            st.markdown("<h2 style='text-align: center'>➡️</h2>", unsafe_allow_html=True)
+            st.markdown(
+                "<svg width='60' height='24' style='display:block;margin:auto'>"
+                "<defs><marker id='arrowhead' markerWidth='8' markerHeight='8' refX='6' refY='3' orient='auto'>"
+                "<path d='M0,0 L6,3 L0,6 z' fill='black'/></marker></defs>"
+                "<line x1='0' y1='12' x2='52' y2='12' stroke='black' stroke-width='2' marker-end='url(#arrowhead)'/>"
+                "</svg>",
+                unsafe_allow_html=True,
+            )
         with col_to:
             st.selectbox("To mechanism", list(models.keys()), key="trans_to")
             
