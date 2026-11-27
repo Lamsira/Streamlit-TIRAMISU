@@ -230,7 +230,7 @@ pg = st.navigation(
     {
         "Principal": [
             st.Page(page_accueil, title="Accueil", icon="🏠", default=True),
-            st.Page(page_donnees, title="Données", icon="📊"),
+            st.Page(page_translation, title="Translation", icon="🔀")
         ],
         "Explorer": [
             st.Page(page_analyse, title="Analyse", icon="🔍"),
