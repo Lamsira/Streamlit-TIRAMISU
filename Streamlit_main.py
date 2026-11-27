@@ -7,6 +7,7 @@ Created on Wed Nov 25 16:16:23 2026
 
 import streamlit as st
 import read_model_new_streamlit as rmn
+import make_translation_streamlit as mt
 import chardet
 st.set_page_config(
     page_title="TIRAMISU",
@@ -172,11 +173,18 @@ def page_translation():
         if not mech_from or not mech_to or mech_from == mech_to:
             st.info("Select two different mechanisms to translate.")
         else:
-            # TODO: run the actual translation between the two models
-            st.write(
-            f"Translating **{mech_from}** into **{mech_to}** "
-            f"(maximum number of permutations: {max_perm}) ..."
-            )
+            try:
+                mt.streamlit_translation(
+                    st.session_state["models"][mech_from],
+                    st.session_state["models"][mech_to],
+                    max_perm,
+                )
+                st.success(
+                    f"Translation **{mech_from}** into **{mech_to}** done "
+                    f"(maximum number of permutations: {max_perm})."
+                )
+            except Exception as e:
+                st.error(f"Translation **{mech_from}** → **{mech_to}** failed: {e}")
             
 # ============================================================
 # 2. DONNÉES
