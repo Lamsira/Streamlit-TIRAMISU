@@ -190,20 +190,21 @@ def page_translation():
     # --- Display the translation result: one container per member of the list ---
     result = st.session_state.get("translation_result")
     if result:
-        for member in result:
+        for iso_groups in result:
             with st.container(border=True):
-                st.markdown(f"**{member.name}** — atomic composition: `{member.atomic_composition}`")
-                if member.translations != {}:
-                    for sub_group in member.translations:
+                st.markdown(f"atomic composition: `{iso_groups.atomic_composition}`")
+                if iso_groups.translations != {}:
+                    for sub_group in iso_groups.translations:
                         col_key, col_sel = st.columns([1, 2])
                         with col_key:
                             st.write(sub_group)
                         with col_sel:
                             st.selectbox(
                                 f"Translation of {sub_group}",
-                                member.model2_species,
-                                key=f"trans_{member.name}_{sub_group}",
+                                iso_groups.model2_species,
+                                key=f"trans_{iso_groups.atomic_composition}_{sub_group}",
                             )
+
             
 # ============================================================
 # 2. DONNÉES
