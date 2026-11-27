@@ -6,9 +6,8 @@ import copy
 import os
 import re
 class IsomerGroup:
-    def __init__(self, output, n, max_permut, atomic_composition=dict(), model1_species=list(),
+    def __init__(self, n, max_permut, atomic_composition=dict(), model1_species=list(),
                  model2_species=list()):
-        self.output = output
         self.atomic_composition = atomic_composition
         self.model1_species = model1_species
         self.model2_species = model2_species
@@ -53,20 +52,7 @@ class IsomerGroup:
                 else:
                     indices_dict[sublist].append(subl)
             
-            
-            for sublist, indices in indices_dict.items():
-                if len(indices) > 1:
-                    count += 1
-                    # print(f"model{n_mod+1} : Identical sublist {sublist} found at indices: {indices}")
-                    if n_mod == 0 :
-                        with open(self.output+'similar_therm_model_to_translate.txt', 'a') as rt :
-                            # print(f'{[model1_species[x] for x in indices]}')
-                            rt.write(f'{[model1_species[x] for x in indices]}\n')
-                    else :
-                        with open(self.output+'similar_therm_model_core.txt', 'a') as rt :
-                            # print(f'{[model2_species[x] for x in indices]}')
-                            rt.write(f'{[model2_species[x] for x in indices]}\n')
-                    
+
             
             # if count != 0:
             #     print("There are", count, "groups of identical sublists.")
@@ -94,7 +80,7 @@ class IsomerGroup:
             minp=min(is_shape)
             n_permut=self.nb_permutation(maxp,minp)
             if n_permut < self.max_permut :
-                print(f'number of permutation for {"".join([f"{key}{value}" for key, value in self.atomic_composition.items()])} : {n_permut}')
+                print(f'number of permutation for {"".join([f"{key}{value}" for key, value in self.atomic_composition])} : {n_permut}')
                 is_sup=1
                 unique_combinations = []
 
@@ -600,3 +586,79 @@ def translate(model1, translation):
                     
                     
     return(translated)
+
+def streamlit_translation(model1, model2, max_permut,n=350):
+    
+    m1_iso, m2_iso = model1.isomer_groups,model2.isomer_groups
+    all_iso_group = set([x for x in m1_iso]+[x for x in m2_iso])
+    isomer_groups = [IsomerGroup(n, max_permut,atomic_composition=x,model1_species=[model1.therm[y] for y in m1_iso[x]] if x in m1_iso else [], model2_species=[model2.therm[y] for y in m2_iso[x]] if x in m2_iso else []) for x in all_iso_group]
+    
+    count=0
+    
+    for isomer_group in isomer_groups :
+        isomer_group.trad()
+        if isomer_group.translations != {} :
+            count+=1
+            
+    print(f'Nb of isomer_groups to trad : {count}')
+    return(isomer_groups)
+
+def download_file(isomer_groups, output, max_permut, model1, model2) :
+    with open(output+'tmp_species_traduction.tmp','w') as result :
+        result.write('! TEMPORARY TRADUCTION FILE\n! Choose an isomer for every line commented by a "!CHECK" and rename the file into'+\
+                    f' tmp_speces_traduction.inp\n! Made with {max_permut} permutations allowed.\n! [X, Y, Z] : \n! X = error between species to trad and the traduction'+\
+                    '\n! Y = error of the best fit for all isomers\n! Z = error of the second best fit for all isomers\n')
+        for isomer_group in isomer_groups :
+            # if isomer_group.atomic_composition == {'c':4, 'h':9, 'o':1} :
+            #     print(isomer_group.translations)
+            if isomer_group.translations != {} : 
+                
+                cool = [f'{x}{isomer_group.atomic_composition[x]} ' for x in isomer_group.atomic_composition]
+                result.write(f'!\n! {"".join(cool)}\n!{isomer_group.model2_species}\n!\n')
+                for iso in isomer_group.translations :
+                    # if iso in [x.species for x in isomer_group.model2_species] :
+                    #     print(iso, [x.species for x in isomer_group.model2_species])
+                    translation=isomer_group.translations[iso]
+                    if type(translation[0]) is list :
+                        # print(translation)
+                        check_error=translation[0][3]
+                        if check_error[1] == 0 :
+                            result.write(f'{iso} = {translation[0][1]}\n')
+                        elif check_error[0] == 0 and translation[0][0] != None :
+                            first_part=f'{iso} = {translation[0][0]}'
+                            result.write(f'{first_part:<50}{" ":10}!WATCHOUT {translation[0][3]}\n')
+                        else :
+                            diff=check_error[1]/check_error[2]
+                            if diff >= 0.8 :
+                                
+                                sec_part=coherence_check(model1, model2, iso, isomer_group.model2_species)
+                                first_part=f'!CHECK {iso} = {translation[0][0:3]}'
+                                result.write(f'{first_part:<50}{" ":10}!{translation[0][3]} {translation[2]:.1f}\n{sec_part}')
+                            elif diff >= 0.1 :
+                                if translation[0][0] != translation[0][1] :
+                                    sec_part=coherence_check(model1, model2, iso, isomer_group.model2_species)
+                                    first_part=f'!CHECK {iso} = {translation[0][0:3]}'
+                                    result.write(f'{first_part:<50}{" ":10}!{translation[0][3]} {translation[2]:.1f}\n{sec_part}')
+                                else :
+                                    if translation[0][1] != translation[0][2] :
+                                        # first_part=f'!CHECK {iso} = {translation[0][1]}'
+                                        first_part=f'{iso} = {translation[0][1]}'
+                                        result.write(f'{first_part:<50}{" ":10}!Should be ok but look : {translation[0][0:3]} {translation[0][3]} {translation[2]:.1f}\n')
+                                    else :
+                                        first_part=f'{iso} = {translation[0][1]}'
+                                        result.write(f'{first_part:<50}{" ":10}!Should be ok {translation[2]:.1f}\n')
+                            else :
+                                first_part=f'{iso} = {translation[0][1]}'
+                                result.write(f'{first_part:<50}{" ":10}!diff<0.1\n')
+                    else :
+                        if translation[1] is False :
+                            result.write(f'{iso} = {translation[0]}\n')
+                        elif translation[1] is True :
+                            if translation[2][0] == 0 :
+                                result.write(f'{iso} = {translation[0]}\n')
+                            else :
+                                sec_part=coherence_check(model1, model2, iso, isomer_group.model2_species)
+                                first_part=f'!CHECK {iso} = {translation[0]}'
+                                result.write(f'{first_part:<50}{" ":10}!Maybe too much isomers. Be careful. Error = {translation[2]} {translation[3]:.1f}\n{sec_part}')
+                        else :
+                            print(f'ERROR : {translation} not True nor False')
